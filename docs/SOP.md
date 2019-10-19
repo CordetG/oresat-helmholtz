@@ -11,9 +11,9 @@
   * u0 is the permeability of free space: 4pi*10^-7 WB A^-1 m^-1
   * n is the number of turns of wire: 58 turns
   * I is the current of the wire being analyzed: user input
-  * h is the distance between the coils: 
-  * a is one half the side length of the structure: 
-  
+  * h is the distance between the coils:
+  * a is one half the side length of the structure:
+
 **Do not operate the Helmholtz Cage if the vacuum chamber is on!**
 
 ---
@@ -37,16 +37,6 @@
 6. Turn the keyboard and the mouse on. There are spare batteries in the tote just in case.
 
 ---
-## Operating the Cage Program:
-
-TBD
-
----
-## Testing & Analyzing Data:
-
-TBD
-
----
 ## While the Helmholtz Cage is Running:
 
 * Do not leave the cage unattended. You must monitor it constantly in case of a fire, to maintain safe temperatures for components, and to ensure accurate data collection.
@@ -62,3 +52,13 @@ TBD
 4. Flip off the surge protector to power down the power supplies, monitor, and cage.
 5. If you adjusted the coil placement, wait until the red wire is cool to the touch before returning the coils to their originally labelled terminals.
 6. Clean up after yourself and keep the workstation organized!
+
+---
+## Operating the Cage Program:
+
+[See main README page](../README.md) for instructions on how to build, deploy, and install this software as a package through [PyPI](https://pypi.org/).
+
+---
+## Testing & Analyzing Data:
+
+TBD

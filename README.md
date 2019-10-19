@@ -1,11 +1,29 @@
-## oresat-helmholtz
-![alt text](https://user-images.githubusercontent.com/33878769/50576984-cde2d900-0dd2-11e9-8117-1c2e21f85c7d.png)
+# Oregon Satelite Helmholtz Cage
+![Helmholtz banner image](imgs/banner.png)
 
-## Magnetic Environment Simulator for CubeSats 
+## Magnetic Environment Simulator for CubeSats
 
-SOP can be found [here](http://psu-epl.github.io/doc/equip/testing/ETL/) at the Electronics Prototyping Lab website
+The __Standard Operating Procedure__ can be found on the [Electronics Prototyping Lab website](http://psu-epl.github.io/doc/equip/testing/ETL)
 
-![alt text](https://user-images.githubusercontent.com/33878769/48651456-dfe9f300-e9af-11e8-9a90-02227cccc314.jpg)
+![Helmholts cage in the ETL](imgs/cage-etl.jpg)
+
+##### A 2018 MCECS BETA Project
+
+---
+
+# Package, Build, and Deploy
+
+**Build:**
+
+`$ ` `python3 setup.py sdist bdist_wheel`
+
+**Deploy:**
+
+`$ ` `python3 -m twine upload dist/*`
 
 
-MCECS BETA Project 2018
+# Local *(Raspberry Pi)* Installation
+
+**Install:**
+
+`$ ` `python3 -m pip install helmholtz-cage`

@@ -1,20 +1,22 @@
-import pip
-import utilities as utils
+import setuptools
 
-DEPENDENCES = ['serial', 'smbus2', 'python-qt5', 'pyqtgraph', 'i2c']
+with open("README.md", "r") as fh:
+    long_description = fh.read()
 
-def install(package):
-    if(hasattr(pip, 'main')):
-        pip.main(['install', package])
-    elif(hasattr(pip, '__internal')):
-        utils.log(0, 'No main class was found when trying to install ' + str(package) + 'switching to internal main.')
-        pip.__internal.main(['install', package])
-
-    utils.log(0, str(package) + ' package guarenteed installed.')
-
-def main():
-    for i in DEPENDENCES:
-        install(i)
-
-if __name__ == '__main__':
-    main()
+setuptools.setup(
+    name="helmholtz-cage",
+    version="1.0.0",
+    author="Dmitri McGuckin",
+    author_email="dmitri.mcguckin26@gmail.com",
+    description="A GUI-Based controller for the OreSat helmlotz magnetic cage.",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/FoxtrotCore/ftf-utilities",
+    packages=setuptools.find_packages(),
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
+    python_requires='>=3.6',
+)
