@@ -1,45 +1,43 @@
-import os, sys, serial
-import utilities as utils
-import cage_controller as cc
-import window as gui
-import command_line as cli
+import sys, time
+from random import  randrange, choice
+from utilities import *
+from main_window import MainWindow
+from PyQt5.QtCore import QTimer
+from PyQt5.QtWidgets import QApplication
 
-def usage(message):
-    utils.log(3, message + '\n\tusage: python3 driver.py [cli/gui]')
+def vtick(supply, volt, window):
+    offset = float((randrange(-100, 100) / 50) * choice([-1, 1]))
+    window.update_status(supply, float(volt  + offset))
 
 def main():
-    if(len(sys.argv) == 2):
-        # Guarantee that the folder for cage data exists
-        if(not os.path.isdir(utils.data_file_path())):
-            utils.log(1, 'Path: ' + utils.data_file_path() + ' does not exist, creating it now.')
-            os.mkdir(utils.data_file_path())
+    time_per_tick = 3000
 
-        # Initialize serial ports
-        utils.log(0, "Attempting to initialize power supplies...")
-        for i in utils.PSU_ADDRS:
-            try:
-                supply = cc.PowerSupply(i)
-                utils.POWER_SUPPLIES.append(supply)
-                supply.toggle_supply(0)
-            except serial.serialutil.SerialException as e:
-                utils.log(3, 'Could not initialize power supply:\n\t' + str(e))
-                # exit(1)
+    volt_1 = 3.0
+    volt_2 = 2.5
+    volt_3 = 2.0
 
-        if((not utils.supply_available())): utils.log(3, 'No power supplies were found, and cage initialization cannot continue.\n\tGracefully exiting.')
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.update_status(1, volt_1)
+    window.update_status(2, volt_2)
+    window.update_status(3, volt_3)
+    window.show()
 
-        # Main controler
-        utils.log(0, 'Beginning main runtime!')
+    #
+    # Tick loop timer
+    #
+    volt1_timer = QTimer()
+    volt1_timer.timeout.connect(lambda: vtick(1, volt_1, window))
+    volt1_timer.start(time_per_tick / 3)
 
-        if(sys.argv[1] == 'cli'):
-            cli.interface() # Synchronous CLI Environmnet
-        elif(sys.argv[1] == 'gui'):
-            gui.interface() # Asynchronous GUI Environmnet
-        else:
-            usage('Invalid option: ' + sys.argv[1] + '!')
-            exit(1)
-    else:
-        usage('Invalid number of options specified for the controller!')
-        exit(1)
+    volt2_timer = QTimer()
+    volt2_timer.timeout.connect(lambda: vtick(2, volt_2, window))
+    volt2_timer.start(time_per_tick / 3)
 
-if __name__ == "__main__":
-    main()
+    volt3_timer = QTimer()
+    volt3_timer.timeout.connect(lambda: vtick(3, volt_3, window))
+    volt3_timer.start(time_per_tick / 3)
+
+    sys.exit(app.exec_())
+
+if __name__ == '__main__': main()

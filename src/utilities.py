@@ -1,70 +1,84 @@
-import os, random, time
+import json
+from enum import Enum
 
-DEBUG = False
-CLOSED_LOOP = True
-TICK_TIME = 500
-GRAPH_RANGE = 35
-INPUT_DELAY = 0.001
-DATA_ACCURACY = 4
-POWER_SUPPLIES = []
-TEMPERATURE_SENSORS = []
-PSU_ADDRS = [ 'ttyUSB0', 'ttyUSB1', 'ttyUSB2' ]
-COIL_ADDRS = [ ['31','32'], ['35','36'], ['37','38'] ] # change if you change pin-out
-ICON_IMG_PATH='./img/icon.png'
-CAGE_DATA_PATH = '/cage_data/'
+class Mode(Enum):
+    INFO = 0
+    DEBUG = 1
+    WARN = 2
+    ERROR = 3
 
-def data_file_path(filename=''):
-    return (str(os.getenv("HOME") + CAGE_DATA_PATH + filename))
+class Color(Enum):
+    HEAD = '\033['
 
-# Gets time since the begining of the unix epoch
-def unique_time():
-    return int(time.time())
+    BLACK = '30m'
+    RED = '31m'
+    GREEN = '32m'
+    YELLOW = '33m'
+    BLUE = '34m'
+    MAGENTA = '35m'
+    CYAN = '36m'
+    WHITE = '37m'
+    GRAY = '90m'
 
-# Gets a human readable version of the time since the unix epoch
-def unique_time_pretty():
-    year, month, day, hour, min, sec, _, _, _ = time.localtime()
-    return (str(hour) + ':' + str(min) + ':' + str(sec) + '-' + str(day) + '-' + str(month) + '-' + str(year))
+    B_RED = '91m'
+    B_GREEN = '92m'
+    B_YELLOW = '93m'
+    B_BLUE = '94m'
+    B_MAGENTA = '95m'
+    B_CYAN = '96m'
+    B_WHITE = '97m'
 
-# Converts from beautiful Celsius to terrible Fahrenheit
-def c_to_f(temp_in_c):
-    return temp_in_c * 1.8 + 32
+    TAIL = '\033[0m'
 
-# Write to console with appended log level
-# level:
-#   0: Info
-#   1: Warn
-#   2: Debug
-#   3: Error
-# message: Console message
+    def __add__(self, other):
+        if(other is Color): return self.value + other.value
+        else: return self.value + str(other)
+    def __radd__(self, other): return str(self) + str(other)
+    def __repr__(self): return str(self.value)
+    def __str__(self):  return str(self.value)
+
+class CString:
+    def __init__(self, color, message):
+        self.color = color
+        self.message = message
+
+    def __add__(self, other): return str(self) + str(other)
+    def __radd__(self, other): return str(other) + str(self)
+    def __repr__(self): return Color.HEAD + self.color + self.message + str(Color.TAIL)
+    def __str__(self):  return Color.HEAD + self.color + self.message + str(Color.TAIL)
+
 def log(mode, message):
-    try:
-        level = {
-            0: 'INFO',
-            1: 'WARN',
-            2: 'DEBUG',
-            3: 'ERROR',
-        }
+    if(isinstance(mode, Mode)):
+        if(mode == Mode.INFO): color = Color.GREEN
+        elif(mode == Mode.DEBUG): color = Color.BLUE
+        elif(mode == Mode.WARN): color = Color.B_YELLOW
+        else: color = Color.RED
+        print("[" + CString(color, mode.name) + "]: " + CString(Color.B_WHITE, message))
+    else: raise TypeError("Expected: (" + str(type(Mode)) + "), got: (" + str(type(mode)) + ")")
 
-        print('[' + level[mode] + ']: ' + message)
-        return True
-    except:
-        return False
+def load_json(file_path):
+    # Read the raw JSON data
+    file = open(file_path)
+    file_data = file.read()
+    file.close()
 
-# Returns whether or not a power suplly has been initialized and added to the global list
-#   Used for safe checking and some error handling
-def supply_available():
-    return (len(POWER_SUPPLIES) > 0)
+    # Transpose raw JSON into dictionary, store it in the object instance
+    return json.loads(file_data)
 
-# Returns whether or not a power suplly has been initialized and added to the global list
-#   Used for safe checking and some error handling
-def temp_sensor_available():
-    return (len(TEMPERATURE_SENSORS) > 0)
+def dump_json(file_path, dictionary):
+    # Transpose dictionary into raw JSON
+    data = json.dumps(dictionary, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, cls=None, indent=2, separators=None, default=None, sort_keys=True)
 
-# Random offset of last value for testing the graph
-def generate_static(sequence):
-    switch_direction = random.randint(0, 1)
-    offset = random.random()
-    average = 0
-    if(len(sequence) > 0): average = sequence[-1]
-    if(switch_direction == 1): offset = -1 * offset
-    return (average + offset)
+    # Write the raw JSON data to the specified file
+    file = open(file_path, mode='w+')
+    file.write(data)
+    file.close()
+
+    return dictionary
+
+def main():
+    print("ANSI colors available:")
+    for color in Color:
+        if(not (color.name in {'HEAD', 'TAIL'})): print("\t" + CString(color, color.name))
+
+if __name__ == '__main__': main()
