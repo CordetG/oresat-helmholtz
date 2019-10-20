@@ -11,7 +11,7 @@ setuptools.setup(
     description="A GUI-Based controller for the OreSat helmlotz magnetic cage.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/FoxtrotCore/ftf-utilities",
+    url="https://github.com/oresat/oresat-helmholtz",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
