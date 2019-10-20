@@ -1,6 +1,11 @@
 import json
 from enum import Enum
 
+class Status(Enum):
+    OFF = '255, 50, 49'
+    ON = '0, 255, 49'
+    UNDF = '255, 135, 49'
+
 class Mode(Enum):
     INFO = 0
     DEBUG = 1

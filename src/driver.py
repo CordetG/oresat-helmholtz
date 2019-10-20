@@ -1,43 +1,59 @@
-import sys, time
-from random import  randrange, choice
+import sys
 from utilities import *
+from PyQt5.QtWidgets import QApplication, QMessageBox
 from main_window import MainWindow
-from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QApplication
 
-def vtick(supply, volt, window):
-    offset = float((randrange(-100, 100) / 50) * choice([-1, 1]))
-    window.update_status(supply, float(volt  + offset))
+# Imports only for simulating
+from random import random, randrange, choice
+from PyQt5.QtCore import QTimer
+
+def tick(timer, window, undef, voltages, currents):
+    for i in range(0, 3):
+        new_status = randrange(0, 100)
+
+        if(not undef[i] and new_status >= 10):
+            direction = choice([-1, 1])
+            voffset = random() * direction
+            coffset = random() * direction
+
+            voltages[i] = voltages[i] + voffset
+            currents[i] = currents[i] + coffset
+
+            window.update_pwr_connection(i + 1, Status.ON)
+            window.update_pwr_status(i + 1, voltages[i], currents[i])
+        elif(not undef[i] and new_status < 10 and new_status > 1):
+            window.update_pwr_connection(i + 1, Status.OFF)
+            window.update_pwr_status(i + 1, 0, 0)
+        else:
+            undef[i] = True
+            window.update_pwr_connection(i + 1, Status.UNDF)
+            window.update_pwr_status(i + 1, -1, -1)
+
+    if(not (False in undef)):
+        msg = 'All three power supplies were lost. The helmholtz cage can no longer operate.'
+        window.create_popup(title="Total Power Loss", text=msg)
+        log(Mode.ERROR, msg)
+        timer.stop()
 
 def main():
-    time_per_tick = 3000
+    # Pre init details
+    undef = [False, False, False]
+    voltages = [3.75, 2.28, 1.25]
+    currents = [0.72, 1.11, 0.33]
 
-    volt_1 = 3.0
-    volt_2 = 2.5
-    volt_3 = 2.0
+    config = load_json('../res/config.json')
 
+    # Init
     app = QApplication(sys.argv)
     window = MainWindow()
-    window.update_status(1, volt_1)
-    window.update_status(2, volt_2)
-    window.update_status(3, volt_3)
     window.show()
 
-    #
-    # Tick loop timer
-    #
-    volt1_timer = QTimer()
-    volt1_timer.timeout.connect(lambda: vtick(1, volt_1, window))
-    volt1_timer.start(time_per_tick / 3)
+    # Tick
+    timer = QTimer()
+    timer.timeout.connect(lambda: tick(timer, window, undef, voltages, currents))
+    timer.start(config['tick_time'])
 
-    volt2_timer = QTimer()
-    volt2_timer.timeout.connect(lambda: vtick(2, volt_2, window))
-    volt2_timer.start(time_per_tick / 3)
-
-    volt3_timer = QTimer()
-    volt3_timer.timeout.connect(lambda: vtick(3, volt_3, window))
-    volt3_timer.start(time_per_tick / 3)
-
+    # Exit
     sys.exit(app.exec_())
 
 if __name__ == '__main__': main()
