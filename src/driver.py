@@ -14,7 +14,7 @@ def tick(timer, window, undef, voltages, currents):
         if(not undef[i] and new_status >= 10):
             direction = choice([-1, 1])
             voffset = random() * direction
-            coffset = random() * direction
+            coffset = (random() * direction) / 2
 
             voltages[i] = voltages[i] + voffset
             currents[i] = currents[i] + coffset
@@ -50,8 +50,9 @@ def main():
 
     # Tick
     timer = QTimer()
+    tick(timer, window, undef, voltages, currents)
     timer.timeout.connect(lambda: tick(timer, window, undef, voltages, currents))
-    timer.start(config['tick_time'])
+    timer.start(config['tick_rate'])
 
     # Exit
     sys.exit(app.exec_())

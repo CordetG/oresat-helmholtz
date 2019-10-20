@@ -2,7 +2,7 @@
   "title": "Helmholtz Cage",
   "short_description": "Magnetic cage.",
   "long_description": "A cage for simulating magnetic environments in low Earth orbit.",
-  "tick_time": 100,
-  "debug": true,
-  "qtg_debug": true
+  "tick_rate": 750,
+  "debug": false,
+  "qtg_debug": false
 }

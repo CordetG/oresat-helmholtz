@@ -13,17 +13,17 @@ class Coil(): # controls for motor drivers
         self.in_a = LED(pin + utils.COIL_ADDRS[psu_index][0])
         self.in_b = LED(pin + utils.COIL_ADDRS[psu_index][1])
         self.positive()
-    
+
     def positive(self):
         self.in_b.off()
         self.in_a.on()
-    
+
     def negative(self):
         self.in_a.off()
         self.in_b.on()
 
 class PowerSupply(serial.Serial):
-    def __init__(self, port_device, input_delay=utils.INPUT_DELAY, baudrate=9600, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=1):
+    def __init__(self, port_device, input_delay=100, baudrate=9600, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=1):
         serial.Serial.__init__(self, port=str('/dev/' + port_device), baudrate=baudrate, parity=parity, stopbits=stopbits, bytesize=bytesize, timeout=timeout)
         self.port_device = port_device
         self.input_delay = input_delay
@@ -84,7 +84,6 @@ class TemperatureSensor():
             TemperatureSensor.bus.close()
             TemperatureSensor.is_closed = True
 
-
     def read(self):
         time.sleep(self.delay)
         raw_data = TemperatureSensor.bus.read_i2c_block_data(cont_conv, 0x05, self.byte_size)
@@ -110,19 +109,19 @@ def temperature_check_bounds(temp, warning, shutoff):
 
 # see page 21 of https://www.nxp.com/docs/en/data-sheet/MAG3110.pdf
 # "When asserted, initiates a magnetic sensor reset cycle that will restore
-# correct operation after exposure to an excessive magnetic field" 
+# correct operation after exposure to an excessive magnetic field"
 # Value goes back to 0 after completion
 def init_magnetometer():
     # Get I2C bus
     bus = smbus.SMBus(1)
     time.sleep(utils.INPUT_DELAY)
-    
+
     # MAG3110 address, 0x0E(14)
     # Select Control register, 0x10(16)
     #        0x01(01)    Normal mode operation, Active mode
     bus.write_byte_data(0x0E, 0x10, 0x01)
     time.sleep(utils.INPUT_DELAY)
-    
+
     # MAG3110 address, 0x0E(14)
     # Select Control register2, 0x11(17)
     bus.write_byte_data(0x0E, 0x11, 0b00010000)
