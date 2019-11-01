@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 from utilities import *
 from PyQt5.QtWidgets import QApplication, QMessageBox
